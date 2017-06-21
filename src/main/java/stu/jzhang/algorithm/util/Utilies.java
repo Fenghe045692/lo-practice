@@ -60,4 +60,14 @@ public class Utilies {
             }
         }
     }
+
+    public static void printArrayList(List list){
+        System.out.print("[");
+        for(Object item : list){
+            System.out.print(item + " ");
+        }
+
+        System.out.print("]");
+        System.out.println();
+    }
 }
