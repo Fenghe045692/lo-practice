@@ -1,6 +1,7 @@
 package stu.jzhang.algorithm.util;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -19,6 +20,12 @@ public class Utilies {
 
     public static void swap(int[] arr, int left, int right){
         int tmp = arr[left];
+        arr[left] = arr[right];
+        arr[right] = tmp;
+    }
+
+    public static void swap(char[] arr, int left, int right){
+        char tmp = arr[left];
         arr[left] = arr[right];
         arr[right] = tmp;
     }

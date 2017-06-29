@@ -2,8 +2,7 @@ package stu.jzhang.algorithm;
 
 import stu.jzhang.algorithm.util.Utilies;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Two pointers. The left side of the left pointer represents processed result.
@@ -11,6 +10,7 @@ import java.util.List;
  * Created by hellen on 6/19/17.
  */
 public class ArraysQuestions {
+
     public static void main(String[] args){
         ArraysQuestions test = new ArraysQuestions();
 //        System.out.println(Arrays.toString(test.deleteDuplicates(new int[]{1,2,2,2,2,2,2,2,2,3,4,5,6})));
@@ -19,7 +19,12 @@ public class ArraysQuestions {
 //        System.out.println(Arrays.toString(test.findLargestAndSmallest(new int[]{1,2,2,2,2,12,2,2,2,3,4,5,6})));
 //        System.out.println(Arrays.toString(test.findLargestAndSecondLargest(new int[]{1,2,12,2,2,12,2,2,2,3,4,5,6})));
 //        Utilies.print2DArray(test.rotateMatrix(new int[][]{{1,2,3,4}, {12,13,14,5}, {11,16,15,6}, {10,9,8,7}}));
-        Utilies.print2DArray(test.rotateMatrixFlips(new int[][]{{1,2,3,4}, {12,13,14,5}, {11,16,15,6}, {10,9,8,7}}));
+//        Utilies.print2DArray(test.rotateMatrixFlips(new int[][]{{1,2,3,4}, {12,13,14,5}, {11,16,15,6}, {10,9,8,7}}));
+//        System.out.println(Arrays.toString(test.largestIntWindow(new int[]{4,2,8,5,1,9}, 3)));
+        System.out.println(test.numIslandsII(new char[][]{{'1','1','1','1','1'},
+                                                        {'1','0','1','0','1'},
+                                                        {'1','0','1','0','1'},
+                                                        {'1','1','1','1', '1'}}));
     }
 
     /**
@@ -209,5 +214,116 @@ public class ArraysQuestions {
         Utilies.mirrorX(matrix);
 
         return matrix;
+    }
+
+    public ListNode mergeListNode(ListNode[] lists){
+        if(lists == null || lists.length == 0){
+            return null;
+        }
+
+        PriorityQueue<ListNode> queue = new PriorityQueue<>(new Comparator<ListNode>() {
+            @Override
+            public int compare(ListNode o1, ListNode o2) {
+                return o1.val - o2.val;
+            }
+        });
+
+        for(int i =0; i < lists.length; i++){
+            if(lists[i] != null){
+                queue.add(lists[i]);
+            }
+        }
+
+        ListNode dummy = new ListNode(0);
+        ListNode p = dummy;
+        while (!queue.isEmpty()){
+            ListNode tmp = queue.poll();
+            if(tmp.next != null){
+                queue.offer(tmp.next);
+            }
+            p.next = tmp;
+            tmp.next = null;
+            p = p.next;
+        }
+
+        return dummy.next;
+    }
+
+    public int[] largestIntWindow(int[] arr, int k){
+        if(arr == null || arr.length == 0 || k <= 0){
+            return null;
+        }
+        int[] result = new int[arr.length - k+1];
+        int m = 0;
+        Deque<Integer> deque = new LinkedList<>();
+        for(int i=0; i < arr.length; i++){
+            while (!deque.isEmpty() && arr[i] >= arr[deque.peekLast()]){
+                deque.pollLast();
+            }
+
+            while (!deque.isEmpty() && i - deque.peekFirst() >= k){
+                deque.pollFirst();
+            }
+
+            deque.offerLast(i);
+
+            if(i >= k-1){
+                result[m++] = arr[deque.peekFirst()];
+            }
+        }
+
+        return result;
+    }
+
+    public int numIslandsII(char[][] grid) {
+        if(grid == null || grid.length == 0 || grid[0].length == 0){
+            return 0;
+        }
+
+        int cnt = 0;
+        boolean[][] visited = new boolean[grid.length][grid[0].length];
+        for(int i = 0; i < grid.length;i++){
+            for(int j = 0; j < grid[0].length; j++){
+                if(grid[i][j] == '0' && !visited[i][j] && helper(grid, visited, i, j) == 1){
+                    cnt++;
+                }
+            }
+        }
+
+        return cnt;
+    }
+
+    private int helper(char[][] grid, boolean[][] visited, int i, int j){
+        // invalid condition
+        if(i < 0 || i >= grid.length || j < 0 || j >= grid[0].length || visited[i][j] || grid[i][j] == '1'){
+            return 1;
+        }
+
+        visited[i][j] = true;
+
+        int res = 1;
+        if(helper(grid, visited, i+1, j) == -1){
+            res = -1;
+        }
+        if(helper(grid, visited, i, j+1) == -1){
+            res = -1;
+        }
+        if(helper(grid, visited, i-1, j) == -1){
+            res = -1;
+        }
+        if(helper(grid, visited, i, j-1) == -1){
+            res = -1;
+        }
+
+        if(i == 0 || i == grid.length -1 || j ==0 || j == grid[0].length -1){
+            res = -1;
+        }
+
+        return res;
+    }
+    static class ListNode {
+        int val;
+        ListNode next;
+        ListNode(int x) { val = x; }
     }
 }
