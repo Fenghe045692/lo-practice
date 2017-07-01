@@ -414,6 +414,11 @@ public class Recursions {
         }
     }
 
+    /**
+     * Get all the factors. for example 12 = [2, 3, 4, 6]
+     * @param num
+     * @return
+     */
     private List<Integer> getFactors(int num){
         List<Integer> factors = new ArrayList<>();
         for(int i =2; i < num; i++){

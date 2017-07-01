@@ -293,34 +293,36 @@ public class ArraysQuestions {
         return cnt;
     }
 
-    private int helper(char[][] grid, boolean[][] visited, int i, int j){
+    private int helper(char[][] grid, boolean[][] visited, int i, int j) {
         // invalid condition
-        if(i < 0 || i >= grid.length || j < 0 || j >= grid[0].length || visited[i][j] || grid[i][j] == '1'){
+        if (i < 0 || i >= grid.length || j < 0 || j >= grid[0].length || visited[i][j] || grid[i][j] == '1') {
             return 1;
         }
 
         visited[i][j] = true;
 
         int res = 1;
-        if(helper(grid, visited, i+1, j) == -1){
+        if (helper(grid, visited, i + 1, j) == -1) {
             res = -1;
         }
-        if(helper(grid, visited, i, j+1) == -1){
+        if (helper(grid, visited, i, j + 1) == -1) {
             res = -1;
         }
-        if(helper(grid, visited, i-1, j) == -1){
+        if (helper(grid, visited, i - 1, j) == -1) {
             res = -1;
         }
-        if(helper(grid, visited, i, j-1) == -1){
+        if (helper(grid, visited, i, j - 1) == -1) {
             res = -1;
         }
 
-        if(i == 0 || i == grid.length -1 || j ==0 || j == grid[0].length -1){
+        if (i == 0 || i == grid.length - 1 || j == 0 || j == grid[0].length - 1) {
             res = -1;
         }
 
         return res;
     }
+
+
     static class ListNode {
         int val;
         ListNode next;
