@@ -1,5 +1,6 @@
 package stu.jzhang.algorithm;
 
+import stu.jzhang.algorithm.model.ListNode;
 import stu.jzhang.algorithm.util.Utilies;
 
 import java.util.*;
@@ -21,11 +22,13 @@ public class ArraysQuestions {
 //        Utilies.print2DArray(test.rotateMatrix(new int[][]{{1,2,3,4}, {12,13,14,5}, {11,16,15,6}, {10,9,8,7}}));
 //        Utilies.print2DArray(test.rotateMatrixFlips(new int[][]{{1,2,3,4}, {12,13,14,5}, {11,16,15,6}, {10,9,8,7}}));
 //        System.out.println(Arrays.toString(test.largestIntWindow(new int[]{4,2,8,5,1,9}, 3)));
-        System.out.println(test.numIslandsII(new char[][]{{'1','1','1','1','1'},
-                                                        {'1','0','1','0','1'},
-                                                        {'1','0','1','0','1'},
-                                                        {'1','1','1','1', '1'}}));
+//        System.out.println(test.numIslandsII(new char[][]{{'1','1','1','1','1'},
+//                                                        {'1','0','1','0','1'},
+//                                                        {'1','0','1','0','1'},
+//                                                        {'1','1','1','1', '1'}}));
+//        System.out.println(test.largestRectangleArea(new int[]{2,1,5,6,2,3}));
     }
+
 
     /**
      * remove duplicates with one left
@@ -271,7 +274,6 @@ public class ArraysQuestions {
                 result[m++] = arr[deque.peekFirst()];
             }
         }
-
         return result;
     }
 
@@ -289,6 +291,7 @@ public class ArraysQuestions {
                 }
             }
         }
+
 
         return cnt;
     }
@@ -322,10 +325,72 @@ public class ArraysQuestions {
         return res;
     }
 
+    /**
+     * Use one Stack to store all the indices of the columns that forms an ascending order.
+     * Each time when we want to calculate the area,
+     * we just need to look at the current element's left indices and its right indices. The key point is how to
+     * calculate the peek area if you find one smaller element. BE CAREFUL OF '?' operator, it is error prone.
+     * @param heights
+     * @return
+     */
+    public int largestRectangleArea(int[] heights) {
 
-    static class ListNode {
-        int val;
-        ListNode next;
-        ListNode(int x) { val = x; }
+        if(heights == null || heights.length == 0){
+            return 0;
+        }
+
+        Deque<Integer> queue = new LinkedList<>();
+        queue.offerLast(-1);
+        int largest = 0;
+        for(int i = 0; i < heights.length; i++){
+            if(queue.peekLast() == -1 || heights[i] >= heights[queue.peekLast()]){
+                queue.offerLast(i);
+                continue;
+            }
+
+            while(queue.peekLast() != -1 && heights[i] < heights[queue.peekLast()]){
+                int tmp = queue.pollLast();
+                largest = Math.max(largest, (i-1 - queue.peekLast()) * heights[tmp]);
+            }
+
+            queue.offerLast(i);
+        }
+
+        while(queue.peekLast() != -1){
+            int tmp = queue.pollLast();
+            largest = Math.max(largest, (heights.length -1 - queue.peekLast()) * heights[tmp]);
+        }
+
+        return largest;
+    }
+
+    /**
+     * 中心开发的逆向思维，从两边入手，一直往里看 Two pointers
+     * @param height
+     * @return
+     */
+    public int trap(int[] height) {
+        if(height == null || height.length == 0){
+            return 0;
+        }
+
+        int leftMax = 0;
+        int rightMax = 0;
+        int i = 0;
+        int j = height.length - 1;
+        int water = 0;
+        while(i < j){
+            leftMax = Math.max(leftMax, height[i]);
+            rightMax = Math.max(rightMax, height[j]);
+
+            if(leftMax < rightMax){
+                water += leftMax - height[i];
+                i++;
+            }else{
+                water += rightMax - height[j];
+                j--;
+            }
+        }
+        return water;
     }
 }

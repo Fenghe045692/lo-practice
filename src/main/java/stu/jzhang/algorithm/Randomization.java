@@ -105,7 +105,7 @@ public class Randomization {
         return num % 7;
     }
 
-    public int getRandom1MFromRandom2(){
+    private int getRandom1MFromRandom2(){
         int num = 1 << 20;
         while (num > 999999){
             int counter = 0;
@@ -122,7 +122,6 @@ public class Randomization {
 
         return num;
     }
-
     private int random25(){
         return 5 *generator.nextInt(5) + generator.nextInt(5);
     }

@@ -17,7 +17,11 @@ public class AdvancedPractice {
 //            Utilies.printArrayList(list);
 //        }
         //System.out.println(test.allParenthesis(3, 0, 0));
-        Utilies.printArrayList(test.common(Arrays.asList(5,1,6,5,2,4,6,6,5), Arrays.asList(5,5,1,3,6)));
+//        Utilies.printArrayList(test.common(Arrays.asList(5,1,6,5,2,4,6,6,5), Arrays.asList(5,5,1,3,6)));
+//        System.out.println(test.kth(25));
+//        System.out.println(test.findMedianSortedArrays(new int[]{1, 3, 4}, new int[]{2}));
+//        System.out.println(test.maximalRectangle(test.getCharArr()));
+        System.out.println(test.lengthOfLIS(new int[]{3,5,6,2,5,4,19,5,6,7,12}));
     }
 
     SkipListNode generateSkipListNode(){
@@ -146,7 +150,7 @@ public class AdvancedPractice {
      * @param exp
      * @return
      */
-    public double pow(double base, int exp){
+    public static double pow(double base, int exp){
         if(exp == 0){
             return 1;
         }
@@ -435,6 +439,198 @@ public class AdvancedPractice {
 
         return bitMaskMap;
     }
+
+
+
+    public static int[] factors = new int[]{3, 5, 7};
+
+    /**
+     * f(x,y,z) = 3^x * 5^y * 7^z
+     * @param k
+     * @return
+     */
+    public long kth(int k) {
+        if(k <= 0){
+            return 0;
+        }
+        Queue<PairProduct> queue = new PriorityQueue<>(new Comparator<PairProduct>() {
+            @Override
+            public int compare(PairProduct o1, PairProduct o2) {
+                return (int)(o1.product - o2.product);
+            }
+        });
+        queue.offer(new PairProduct(-1, 1));
+        while(k > 1){
+            PairProduct currPair = queue.poll();
+            System.out.print(currPair.product + "  ");
+            for(int i = 0; i < factors.length; i++){
+                if(factors[i] >= currPair.factor){
+                    queue.offer(new PairProduct(factors[i], factors[i] * currPair.product));
+                }
+            }
+            k--;
+        }
+        return queue.poll().product;
+    }
+
+    /**
+     * This is really not a very hard question. The tough point is how to write your recursion function.
+     * @param nums1
+     * @param nums2
+     * @return
+     */
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        int m = nums1.length;
+        int n = nums2.length;
+        int count = m + n;
+        if(count % 2 == 0){
+            double t1 = helper(nums1, 0, nums1.length - 1, nums2, 0, nums2.length - 1, count/2);
+            double t2 = helper(nums1, 0, nums1.length - 1, nums2, 0, nums2.length - 1, count/2 + 1);
+            return (t1 + t2)/ 2.0;
+        }else{
+            return helper(nums1, 0, nums1.length - 1, nums2, 0, nums2.length - 1, count/2 + 1);
+        }
+    }
+
+    /**
+     *
+     * Find the kth smallest element between array nums1 with range from ml to mr and array nums2 with range from nl to nr.
+     * We do not strictly split the k into k/2, we just need to make sure the split two part equals to or smaller than K.
+     * For example, we split 7 into 1 + 6 or 3 + 4, which means that the main goal is to break half of the input each time.
+     * @param nums1
+     * @param ml
+     * @param mr
+     * @param nums2
+     * @param nl
+     * @param nr
+     * @param k
+     * @return
+     */
+    public double helper(int[] nums1, int ml, int mr, int[] nums2, int nl, int nr, int k){
+        // base case one of the array's elements have been removed to find the kth smallest element
+        if(ml >= nums1.length){
+            return nums2[nl + k-1];
+        }
+
+        if(nl >= nums2.length){
+            return nums1[ml + k-1];
+        }
+
+        // we can directly find the 1th smallest element
+        if(k == 1){
+            return Math.min(nums1[ml], nums2[nl]);
+        }
+        int halfLDist = Math.min(mr - ml + 1, k/2);
+        int halfRDist = Math.min(nr - nl + 1, k - halfLDist);
+        if(nums1[ml + halfLDist-1] < nums2[nl + halfRDist-1]){
+            return helper(nums1, ml + halfLDist, mr, nums2, nl, nl + halfRDist-1, k - halfLDist);
+        }else{
+            return helper(nums1, ml, ml + halfLDist - 1, nums2, nl + halfRDist, nr, k - halfRDist);
+        }
+
+    }
+
+
+    public int maximalRectangle(char[][] matrix) {
+
+        if(matrix == null || matrix.length == 0 ||  matrix[0].length == 0){
+            return 0;
+        }
+        int m = matrix.length;
+        int n = matrix[0].length;
+
+        int[][] dpBT = new int[m][n];
+        for(int j = 0; j < n; j++){
+            dpBT[0][j] = matrix[0][j] - '0';
+            for(int i = 1; i < m; i++){
+                dpBT[i][j] = dpBT[i-1][j] + (matrix[i][j] - '0');
+            }
+        }
+        int max = 0;
+        for(int j = 0; j < m; j++){
+            for(int i = 0; i <= j; i++){
+                int cnt = 0;
+                int curMax = 0;
+                int width = j-i+1;
+                for(int k = 0; k < n; k++){
+                    int w = dpBT[j][k] - dpBT[i][k] + (matrix[i][k] - '0');
+                    if(w == width && cnt != 0){
+                        cnt++;
+                    }else{
+                        cnt = w == width ? 1 : 0;
+                    }
+                    curMax = Math.max(curMax, cnt);
+                }
+
+                max = Math.max(max, curMax * width);
+            }
+        }
+
+        return max;
+    }
+
+    public int lengthOfLIS(int[] nums) {
+        if(nums == null || nums.length == 0){
+            return 0;
+        }
+
+        int top = 0;
+        for(int i = 1; i < nums.length; i++){
+            if(nums[i] > nums[top]){
+                nums[++top] = nums[i];
+            }else{
+                int p = 0;
+                int q = top;
+                // find the smallest number which is larger than the current nums[i]
+                boolean isExist = false;
+                while(p + 1 < q){
+                    int mid = (p+q)/2 + p;
+                    if(nums[mid] > nums[i]){
+                        q = mid - 1;
+                    }else if(nums[mid] == nums[i]){
+                        isExist = true;
+                        break;
+                    }else{
+                        p = mid + 1;
+                    }
+                }
+                isExist = isExist || nums[p] == nums[i] || nums[q] == nums[i];
+                if(isExist){
+                    continue;
+                }
+                // adjust the expected num to nums[i]
+                if(nums[p] > nums[i]){
+                    nums[p] = nums[i];
+                }else if(nums[q] > nums[i]){
+                    nums[q] = nums[i];
+                }else{
+                    nums[q+1] = nums[i];
+                }
+            }
+        }
+
+        return ++top;
+    }
+
+    private char[][] getCharArr(){
+//        return new char[][]{
+//                {'1','0','1','0','0'},
+//                {'1','0','1','1','1'},
+//                {'1','1','1','1','1'},
+//                {'1','0','0','1','0'}};
+        return new char[][]{{'0','1'}, {'1','0'}};
+    }
+
+    private static class PairProduct{
+        int factor;
+        long product;
+
+        public PairProduct(int factor, long product) {
+            this.factor = factor;
+            this.product = product;
+        }
+    }
+
 
     public static class SkipListNode{
         int value;
