@@ -1,5 +1,6 @@
 package stu.jzhang.algorithm;
 
+import stu.jzhang.algorithm.model.Point;
 import stu.jzhang.algorithm.util.Utilies;
 
 import java.util.*;
@@ -21,7 +22,21 @@ public class AdvancedPractice {
 //        System.out.println(test.kth(25));
 //        System.out.println(test.findMedianSortedArrays(new int[]{1, 3, 4}, new int[]{2}));
 //        System.out.println(test.maximalRectangle(test.getCharArr()));
-        System.out.println(test.lengthOfLIS(new int[]{3,5,6,2,5,4,19,5,6,7,12}));
+//        System.out.println(test.lengthOfLIS(new int[]{3,5,6,2,5,4,19,5,6,7,12}));
+//        System.out.println(test.maxPoints(new Point[]{new Point(2,3),new Point(3,3),new Point(-5,3)}));
+//        System.out.println(Arrays.toString(test.countArray(new int[]{4, 1, 3, 2})));
+//        System.out.println(test.maxProfit(new int[]{2, 1, 2, 0, 1}));
+//        System.out.println(test.maximalRectangleDP(new char[][]{
+//                { '0', '0', '1', '0', '0' },
+//
+//                { '1', '1', '1', '1', '0' },
+//
+//                { '0', '0', '1', '0', '0' },
+//
+//                { '0', '0', '1', '0', '0' },
+//
+//                { '0', '0', '1', '0', '0' }}));
+        System.out.println(test.longestIncreasingPath(new int[][]{{9,9,4},{6,6,8},{2,1,1}}));
     }
 
     SkipListNode generateSkipListNode(){
@@ -530,7 +545,12 @@ public class AdvancedPractice {
 
     }
 
-
+    /**
+     * The key point is how to construct your rectangle, then we can find what we expect when we construct the rectangle.
+     * This method is based on all the kinds of width, then we calculate the height. The time conplexity is O(m*m*n).
+     * @param matrix
+     * @return
+     */
     public int maximalRectangle(char[][] matrix) {
 
         if(matrix == null || matrix.length == 0 ||  matrix[0].length == 0){
@@ -564,6 +584,108 @@ public class AdvancedPractice {
 
                 max = Math.max(max, curMax * width);
             }
+        }
+
+        return max;
+    }
+
+    /**
+     * The key point is that we try out each cell of the matrix. Based on the single point(i,j), we try to construct
+     * this matrix from two sides with the largest height. Then we need to find its left boundary and its right boundary.
+     * Then the rectangle area is (rightB(i, j) - leftB(i,j)) * height(i,j).
+     *
+     * left[i,j] = Max(left[i-1,j], currOfLeft] it represents the largest left boundary
+     * right[i,j] = Min(right[i-1,j], currOfRight] it represents the smallest right boundary
+     * height[i, j] = matrix[i, j] == 1 ?  height[i-1, j] + 1 : 0
+     *
+     * @example :   0 0 0 1 0 0 0
+                    0 1 1 1 1 0 0
+                    1 1 1 1 1 1 1
+     * @param matrix
+     * @return
+     */
+    public int maximalRectangleDP(char[][] matrix){
+        int m = matrix.length, n = m > 0 ? matrix[0].length : 0;
+        int[] left = new int[n], right = new int[n], height = new int[n];
+
+        // initiate the extra array
+        Arrays.fill(left, 0);
+        Arrays.fill(right, n);
+        Arrays.fill(height, 0);
+
+        int max = 0;
+        for(int i = 0; i < m; i++){
+
+            // calculate each left boundary
+            int currLeft = 0;
+            for(int j = 0; j < n; j++){
+                if(matrix[i][j] == '1'){
+                    left[j] = Math.max(left[j], currLeft);
+                }else{
+                    left[j] = 0;
+                    // we always record the last 1 to mark the largest left boundary
+                    currLeft = j+1;
+                }
+            }
+
+            // calculate each right boundary
+            int currRight = n;
+            for(int j = n-1; j >= 0; j--){
+                if(matrix[i][j] == '1'){
+                    right[j] = Math.min(right[j], currRight);
+                }else{
+                    right[j] = n;
+                    // we always record the last 1(left index of last 1) to mark the smallest left boundary
+                    currRight = j;
+                }
+            }
+
+            // calculate the longest height
+            for(int j = 0; j < n; j++){
+                if(matrix[i][j] == '1'){
+                    height[j]++;
+                    max = Math.max(max, (right[j] -  left[j]) * height[j]);
+                }else{
+                    height[j] = 0;
+                }
+            }
+        }
+
+        return max;
+    }
+
+    /**
+     * we can use the leetcode largest rectangle in histogram to solve this question. This is also one way to construct
+     * the expected matrix. Then we use O(N) to find the largest rectangle.
+     */
+    public int maximalRectangleHistogram(char[][] matrix) {
+        int m = matrix.length, n = m > 0 ? matrix[0].length : 0;
+        int[] left = new int[n], right = new int[n], height = new int[n];
+
+        int max = 0;
+        Deque<Integer> stack = new LinkedList<>();
+        for(int i = 0; i < m; i++){
+            // calculate the longest height
+            for(int j = 0; j < n; j++){
+                if(matrix[i][j] == '1'){
+                    height[j]++;
+                }else{
+                    height[j] = 0;
+                }
+            }
+
+            // largest rectangle in histogram
+            for(int j = 0; j <=n; j++){
+                int h = (j == n ? -1 : height[j]);
+                if(!stack.isEmpty() && h < height[stack.peekLast()]){
+                    while(!stack.isEmpty() && h < height[stack.peekLast()]){
+                        int curr = height[stack.pollLast()];
+                        max = Math.max(max, (stack.isEmpty() ? j : j - 1 - stack.peekLast()) * curr);
+                    }
+                }
+                stack.offerLast(j);
+            }
+            stack.clear();
         }
 
         return max;
@@ -612,6 +734,160 @@ public class AdvancedPractice {
         return ++top;
     }
 
+    // The key point is how to construct the line orderly.
+    public int maxPoints(Point[] points) {
+        if(points == null || points.length == 0){
+            return 0;
+        }
+
+        if(points.length == 1){
+            return 1;
+        }
+
+        int max = 0;
+        for(int i = 0; i < points.length; i++){
+            HashMap<Line, Integer> map = new HashMap<>();
+            int samePoint = 1;
+            int vertical = 1;
+            for(int j = i+1; j < points.length; j++){
+                if(points[i].x == points[j].x && points[i].y == points[j].y){
+                    samePoint++;
+                    continue;
+                }
+
+                if(points[i].x == points[j].x){
+                    vertical++;
+                    continue;
+                }
+
+                Line line = points[j].y == points[i].y ? new Line(0.0) :
+                        new Line(new Double(points[j].y - points[i].y)/ new Double(points[j].x - points[i].x));
+                if(map.containsKey(line)){
+                    map.put(line, map.get(line) + 1);
+                }else{
+                    map.put(line, 1);
+                }
+            }
+            int localMax = 0;
+            for(Integer value : map.values()){
+                localMax = Math.max(localMax, value);
+            }
+
+            localMax = Math.max(localMax, vertical);
+            localMax += samePoint;
+
+            max = Math.max(localMax, max);
+        }
+
+        return max;
+    }
+
+    public int[] countArray(int[] nums){
+        if(nums == null || nums.length == 0){
+            return new int[]{};
+        }
+        Cell[] cells = new Cell[nums.length];
+        for(int i = 0; i < nums.length; i++){
+            cells[i] = new Cell(nums[i]);
+        }
+
+        merge(cells, 0, nums.length - 1);
+        int[] res = new int[nums.length];
+        for(int i = 0; i < nums.length; i++){
+            res[i] = cells[i].cnt;
+        }
+
+        return res;
+    }
+
+    public void merge(Cell[] cells, int i, int j){
+        if(i >= j){
+            return;
+        }
+
+        int mid = (j-i)/2 + i;
+        merge(cells, i, mid);
+        merge(cells, mid+1, j);
+        mergeTwoPartsArray(cells, new Cell[cells.length], i, mid, j);
+    }
+
+    private void mergeTwoPartsArray(Cell[] cells, Cell[] helper, int i, int mid, int j){
+        for(int m = i; m <= j; m++){
+            helper[m] = cells[m];
+        }
+        int p = i;
+        int q = mid+1;
+        int n = i;
+        while (p <= mid && q <= j){
+            if(cells[p].num < cells[q].num){
+                cells[p].cnt += q-mid-1;
+                helper[n++] = cells[p];
+                p++;
+            }else if(cells[p].num > cells[q].num){
+                cells[q].cnt += p-i;
+                helper[n++] = cells[q];
+                q++;
+            }else{
+                helper[n++] = cells[p];
+                helper[n++] = cells[q];
+                p++;
+                q++;
+            }
+        }
+
+        if(p <= mid){
+            while (p <= mid){
+                cells[p].cnt += j-mid;
+                helper[n++] = cells[p++];
+            }
+        }
+
+        if(q <= mid){
+            while (q <= mid){
+                cells[q].cnt += j-mid;
+                helper[n++] = cells[p++];
+            }
+        }
+
+        for(int m = i; m <= j; m++){
+            cells[m] = helper[m];
+        }
+    }
+
+
+    public class Cell{
+        int num;
+        int cnt; // number of item which is smaller than the current item
+
+        public Cell(int num) {
+            this.num = num;
+        }
+    }
+
+    public class Line{
+        double res;
+
+        Line(double res){
+            this.res = res;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Line line = (Line) o;
+
+            return Double.compare(line.res, res) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            long temp = Double.doubleToLongBits(res);
+            return (int) (temp ^ (temp >>> 32));
+        }
+    }
+
     private char[][] getCharArr(){
 //        return new char[][]{
 //                {'1','0','1','0','0'},
@@ -619,6 +895,65 @@ public class AdvancedPractice {
 //                {'1','1','1','1','1'},
 //                {'1','0','0','1','0'}};
         return new char[][]{{'0','1'}, {'1','0'}};
+    }
+
+    public int maxProfit(int[] prices) {
+        if(prices == null || prices.length == 0){
+            return 0;
+        }
+
+        int[] dp = new int[prices.length];
+        int min = prices[0];
+        for(int i = 1; i < prices.length; i++){
+            if(prices[i] >= min){
+                dp[i] = Math.max(dp[i-1], prices[i] - min);
+            }else{
+                min = prices[i];
+                dp[i] = dp[i-1];
+            }
+        }
+        int max = 0;
+        for(int i = 1; i < prices.length; i++){
+            for(int j = 0; j < i; j++){
+                if(prices[j] < prices[i]){
+                    max = Math.max(max, prices[i] - prices[j] + dp[j]);
+                }
+            }
+        }
+
+        return max;
+    }
+
+    public int longestIncreasingPath(int[][] matrix) {
+        int m = matrix.length, n = m > 0 ? matrix[0].length : 0;
+
+        int max = 0;
+        int[][] direct = new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        int[][] dp = new int[m][n];
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                max = Math.max(max, dfs(matrix, dp, direct, i, j));
+            }
+        }
+
+        return max;
+    }
+
+    public int dfs(int[][] matrix, int[][] dp, int[][] direct, int i, int j){
+        int max = 1;
+        for(int k = 0; k < direct.length; k++){
+            int x = i + direct[k][0];
+            int y = j + direct[k][1];
+
+            if(x < 0 || x >= matrix.length || y < 0 || y >= matrix[0].length || matrix[i][j] >= matrix[x][y]){
+                continue;
+            }
+
+            max = Math.max(max, dfs(matrix, dp, direct, x, y) + 1);
+        }
+
+        dp[i][j] = max;
+        return max;
     }
 
     private static class PairProduct{

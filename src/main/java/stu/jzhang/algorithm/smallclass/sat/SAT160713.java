@@ -3,6 +3,7 @@ package stu.jzhang.algorithm.smallclass.sat;
 import stu.jzhang.algorithm.model.ListNode;
 
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -14,7 +15,9 @@ public class SAT160713 {
         SAT160713 test = new SAT160713();
 //        System.out.println(test.isPalinDrome(test.generatePalindromicListNode()));
 //        System.out.println(test.isPalindrome(4224));
-        System.out.println(test.longestPalindromeSequenceWithRecursion("bbbbab"));
+//        System.out.println(test.longestPalindromeSequenceWithRecursion("bbbbab"));
+//        System.out.println(test.findTarget(new int[]{5, 0, 2, 7, 4}, 8));
+        System.out.println(test.findTheLongestSubString("1233215"));
     }
 
     /**
@@ -172,6 +175,62 @@ public class SAT160713 {
 
         return dp[left][right];
     }
+
+    public boolean findTarget(int[] nums, int target){
+        if(nums == null || nums.length == 0){
+            return false;
+        }
+
+        HashSet<Integer> set = new HashSet<>();
+        set.add(0);
+        int currSum = 0;
+        for(int i = 0; i < nums.length; i++){
+            currSum += nums[i];
+            if(set.contains(currSum - target)){
+                return true;
+            }
+            set.add(currSum);
+        }
+
+        return false;
+    }
+
+    public int findTheLongestSubString(String str){
+        if(str ==null){
+            return 0;
+        }
+
+        if(str.length() < 2){
+            return str.length();
+        }
+
+
+        int[] sumdp = new int[str.length()];
+        sumdp[0] = str.charAt(0) - '0';
+        for(int i = 1; i < str.length();i++){
+            sumdp[i] = str.charAt(i) - '0' + sumdp[i-1];
+        }
+        int max = 0;
+        for(int i = 2; i <= str.length()/2; i++){
+            for(int j = 0; j + 2*i - 1 < str.length();j++){
+                if(isValid(str, sumdp, j, j+2*i-1)){
+                    max = i;
+                    break;
+                }
+            }
+        }
+
+        return 2 * max;
+    }
+
+    private boolean isValid(String str, int[] sumdp, int i, int j){
+        int mid = (i + j)/2;
+        int left = sumdp[mid] - sumdp[i] + str.charAt(i) - '0';
+        int right = sumdp[j] - sumdp[mid+1] + str.charAt(mid + 1) - '0';
+        return left == right;
+    }
+
+
 
     private ListNode generatePalindromicListNode(){
         ListNode l1 = new ListNode(5);

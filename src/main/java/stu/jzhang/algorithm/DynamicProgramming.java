@@ -26,7 +26,9 @@ public class DynamicProgramming {
 //        System.out.println(test.longestCommonSubsequence("student", "suldten"));
 //        System.out.println(test.longestAscendingSubSequence(new int[]{100, 0, 200, 1, 3, 4}));
 //        System.out.println(Arrays.binarySearch(new int[]{1, 3, 4, 7, 9}, 5));
-        System.out.println(test.pizzaPickUp(new int[]{2, 6, 2, 10}));
+//        System.out.println(test.pizzaPickUp(new int[]{2, 6, 2, 10}));
+//        System.out.println(test.minCost(new int[]{4, 2, 2, 2, 4}));
+        System.out.println(test.largestSubArrayWithK(new int[]{-1, -2, -3, -4, -5}, 2));
     }
 
 
@@ -160,5 +162,75 @@ public class DynamicProgramming {
         }
 
         return dp[1][pizzas.length];
+    }
+
+    /**
+     * The key point is how to break the larger problems into smaller problems.
+     * @param stones
+     * @return
+     */
+    public int minCost(int[] stones) {
+        if(stones.length == 0){
+            return 0;
+        }
+
+        // dp[i][j] represents the minimum cost between i+1th stone and j+1th stone.
+        int[][] dp = new int[stones.length][stones.length];
+        // base case dp[i][i] = 0. not cost needed to merge stone.
+        for(int i = 0; i < stones.length; i++){
+            dp[i][i] = 0;
+        }
+
+        // base case 2.
+        for(int i = 0; i < stones.length - 1; i++){
+            dp[i][i+1] = stones[i] + stones[i+1];
+        }
+
+        int[] sumDp = new int[stones.length];
+        sumDp[0] = stones.length;
+
+        // sumArray
+        for(int i = 1; i < stones.length; i++){
+            sumDp[i] += sumDp[i-1] + stones[i];
+        }
+
+        for(int i = 2; i < stones.length; i++){
+            for(int j = 0; j + i < stones.length; j++){
+                int min = Integer.MAX_VALUE;
+                int lastNum = sumDp[i+j] - sumDp[j] + stones[j];
+                // induction rule:
+                //      dp[i][j] = min(dp[i][k] + dp[k+1][j] + lastNum) i <= k <=j
+                for(int k = i + j; k > j; k--){
+                    min = Math.min(min, dp[k][i+j] + dp[j][k-1] + lastNum);
+                }
+                dp[j][i+j] = min;
+            }
+
+        }
+        return dp[0][stones.length - 1];
+    }
+
+    public int largestSubArrayWithK(int[] arr, int k){
+        if(arr.length == 0 || k <= 0 || k > arr.length){
+            return 0;
+        }
+
+        int[] sumDp = new int[arr.length];
+        for(int i = 0; i < arr.length; i++){
+            sumDp[i] = arr[i] + (i == 0 ? 0 : sumDp[i-1]);
+        }
+
+        int max = sumDp[k-1];
+        // dp[i] represents the largest subarray with at k elements.
+        int[] dp = new int[arr.length];
+        dp[k-1] = sumDp[k-1];
+        for(int i = k; i < arr.length; i++){
+            // Two cases : 1. exactly k elements
+            //              2. more than k elements
+            dp[i] = Math.max(sumDp[i] - sumDp[i-k], dp[i-1] + arr[i]);
+            max = Math.max(max, dp[i]);
+        }
+
+        return max;
     }
 }

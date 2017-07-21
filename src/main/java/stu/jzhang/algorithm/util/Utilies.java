@@ -78,4 +78,18 @@ public class Utilies {
         System.out.println();
     }
 
+    public static int hightsOneBits(int k){
+        // negative or 0 is not supported.
+        if(k <= 0){
+            return 0;
+        }
+        int cnt = 0;
+        while (k >> 1 != 0){
+            k >>= 1;
+            cnt++;
+        }
+
+        return cnt;
+    }
+
 }
