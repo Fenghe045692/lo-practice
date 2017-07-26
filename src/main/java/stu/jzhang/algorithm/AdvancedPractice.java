@@ -956,6 +956,40 @@ public class AdvancedPractice {
         return max;
     }
 
+
+    /**
+     * Burst balloon The key point is how to construct your sub-problem in the opposite way
+     * [1, 3, 1, 5, 8, 1]
+     * @param nums
+     * @return
+     */
+    public int maxCoins(int[] nums) {
+        if(nums.length == 0){
+            return 0;
+        }
+        int[] arr = new int[nums.length + 2];
+        arr[0] = 1;
+        arr[nums.length + 1] = 1;
+        for(int i = 0; i < nums.length; i++){
+            arr[i+1] = nums[i];
+        }
+        int[][] dp = new int[nums.length+2][nums.length+2];
+
+        // fill in order.
+        for(int i = 2; i < arr.length; i++){
+            for(int j = 0; j +i < arr.length; j++){
+                int max = Integer.MIN_VALUE;
+                for(int k = j+i-1; k > j; k--){
+                    max = Math.max(max, arr[j] * arr[j+i] * arr[k] + dp[j][k] + dp[k][j+i]);
+                }
+
+                dp[j][j+i] = max;
+            }
+        }
+
+        return dp[0][nums.length+1];
+    }
+
     private static class PairProduct{
         int factor;
         long product;

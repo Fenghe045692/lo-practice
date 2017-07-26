@@ -23,11 +23,11 @@ public class Recursions {
 //        }
 
 //        Utilies.printArrayList(test.allPermutations("bbbc"));
-//        for(List<Integer> list : test.allSubsetsII(new int[]{1,1,1,2,3})){
-//            Utilies.printArrayList(list);
-//        }
+        for(List<Integer> list : test.allSubsetsII(new int[]{1,1,1,2,3})){
+            Utilies.printArrayList(list);
+        }
 //        Utilies.printArrayList(test.coinsOfCombinations(new int[]{25, 10, 5, 1}, 100));
-        Utilies.printArrayList(test.factors(12));
+//        Utilies.printArrayList(test.factors(12));
     }
 
     /**
@@ -255,6 +255,8 @@ public class Recursions {
     private void dfs(int[] arr, int index, List<Integer> path, List<List<Integer>> res) {
         res.add(new ArrayList<>(path));
 
+        // This monotonically increasing order only guarantee we have unique way of selecting. We still need to
+//        avoid duplicate items inside array
         for (int i = index; i < arr.length; i++) {
             if (i != index && arr[i] == arr[i - 1]) {
                 continue;
