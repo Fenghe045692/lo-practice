@@ -4,6 +4,7 @@ import stu.jzhang.algorithm.model.TreeNode;
 import stu.jzhang.algorithm.util.Utilies;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -23,11 +24,14 @@ public class Recursions {
 //        }
 
 //        Utilies.printArrayList(test.allPermutations("bbbc"));
-        for(List<Integer> list : test.allSubsetsII(new int[]{1,1,1,2,3})){
-            Utilies.printArrayList(list);
-        }
+//        for(List<Integer> list : test.allSubsetsII(new int[]{1,1,1,2,3})){
+//            Utilies.printArrayList(list);
+//        }
 //        Utilies.printArrayList(test.coinsOfCombinations(new int[]{25, 10, 5, 1}, 100));
 //        Utilies.printArrayList(test.factors(12));
+        for(List<Integer> arr : test.permuteUnique(new int[]{1, 1, 1, 2})){
+            Utilies.printArrayList(arr);
+        }
     }
 
     /**
@@ -244,8 +248,8 @@ public class Recursions {
     }
 
     /**
-     * Each level will generate one subset. we will always sort the original array to avoid duplicate items. The path direction is
-     * always performing from left to right.
+     * Each level will generate one subset. we will always sort the original array to avoid duplicate items.
+     * The path direction is always performing from left to right.
      *
      * @param arr
      * @param index
@@ -300,6 +304,36 @@ public class Recursions {
                 helper(str, index + 1, res);
                 Utilies.swap(str, index, i);
             }
+        }
+    }
+
+    /**
+     * each time we follow monotonically increasing order to pick up the elements.
+     * @param nums
+     * @return
+     */
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        List<List<Integer>> rst = new ArrayList<>();
+        Arrays.sort(nums);
+        dfs(nums, new boolean[nums.length], 0, new ArrayList<>(), rst);
+        return rst;
+    }
+
+    private void dfs(int[] nums, boolean[] used, int index, List<Integer> path, List<List<Integer>> rst){
+        if(index >= nums.length){
+            rst.add(new ArrayList<>(path));
+            return;
+        }
+
+        for(int i = 0; i < nums.length; i++){
+            if(used[i] || (i > 0 && nums[i] == nums[i-1] && !used[i-1])){
+                continue;
+            }
+            used[i] = true;
+            path.add(nums[i]);
+            dfs(nums, used, index + 1, path, rst);
+            used[i] = false;
+            path.remove(path.size() - 1);
         }
     }
 
@@ -430,5 +464,58 @@ public class Recursions {
         }
 
         return factors;
+    }
+
+    /**
+     * The key point is to how efficiently use your condition from the questions to construct the solution.
+     * @param n
+     * @return
+     */
+    public List<List<String>> solveNQueens(int n) {
+        List<List<String>> result = new ArrayList<>();
+        char[] queuePos = new char[n];
+        Arrays.fill(queuePos, '.');
+        helper(n, 0, result, new ArrayList<>(), new boolean[n],
+                new boolean[2*n - 1], new boolean[2*n - 1], queuePos);
+        return result;
+    }
+
+    /**
+     *
+     * @param n It is better to start with 0, so that we can work with this three arrays to contribute more clean code.
+     * @param row
+     * @param result
+     * @param currSolution
+     * @param cols it contains all the columns position usage.
+     * @param leftDiagonal It contains all the 135 degrees of inclination diagonals, The number of them is 2*n -1.
+     * @param rightDiagonal It contains all the 45 degrees of inclination diagonals, The number of them is 2*n -1.
+     * @param queuePos We use a char arr to quickly get one String of queue solution.
+     */
+    private void helper(int n, int row, List<List<String>> result, List<String> currSolution, boolean[] cols,
+                        boolean[] leftDiagonal, boolean[] rightDiagonal, char[] queuePos) {
+        if (row >= n) {
+            result.add(new ArrayList<>(currSolution));
+            return;
+        }
+
+        for (int col = 0; col < n; col++) {
+            // check three direction's validity
+            if(!cols[col] && !leftDiagonal[col+row] && !rightDiagonal[n-1+col-row]){
+                currSolution.add(getNewLineOfSolution(n, col, queuePos));
+                cols[col] = leftDiagonal[col+row]= rightDiagonal[n-1+col-row] = true;
+
+                helper(n, row+1, result, currSolution, cols, leftDiagonal, rightDiagonal, queuePos);
+                currSolution.remove(currSolution.size() - 1);
+
+                cols[col] = leftDiagonal[col+row]= rightDiagonal[n-1+col-row] = false;
+            }
+        }
+    }
+
+    private String getNewLineOfSolution(int n, int col, char[] queuePos) {
+        queuePos[col] = 'Q';
+        String rst = new String(queuePos);
+        queuePos[col] = '.';
+        return rst;
     }
 }

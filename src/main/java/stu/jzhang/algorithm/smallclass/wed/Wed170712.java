@@ -19,9 +19,10 @@ public class Wed170712 {
 //        System.out.println(test.canIWin(10, 9));
 //        System.out.println(test.numberoOfSubsequence("rabbbit", "rabit"));
 //        System.out.println(test.numDecodings("01"));
-        for(List<Integer> item : test.combinationSum3(3, 7)){
-            Utilies.printArrayList(item);
-        }
+//        for(List<Integer> item : test.combinationSum3(3, 7)){
+//            Utilies.printArrayList(item);
+//        }
+        System.out.println(test.combinationSum4(new int[]{3, 1, 2, 4}, 4));
     }
 
     public boolean canIWin(int target, int n, HashMap<Integer, Boolean> mem){
@@ -195,5 +196,49 @@ public class Wed170712 {
         dfs(n - curr, k, curr+1, index + 1, path, rst);
         path.remove(path.size() - 1);
         dfs(n, k, curr+1, index, path, rst);
+    }
+
+    public int combinationSum4(int[] nums, int target) {
+        int[] dp = new int[target + 1];
+        dp[0] = 1;
+        for(int i = 1; i <= target; i++){
+            for(int j = 0; j < nums.length; j++){
+                if(nums[j] <= i) dp[i] += dp[i- nums[j]];
+            }
+        }
+        return dp[target];
+    }
+
+    /**
+     * How to construct your solution and optimize it.
+     * @param nums
+     * @return
+     */
+    public int longestConsecutive(int[] nums) {
+        if(nums.length <= 1){
+            return nums.length;
+        }
+        int max = 0;
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for(int num : nums){
+            if(!map.containsKey(num)){
+                int left = map.getOrDefault(num-1, 0);
+                int right = map.getOrDefault(num+1,0);
+
+                int sum = left + right + 1;
+
+                map.put(num, sum);
+
+                // left boundary
+                map.put(num-left, sum);
+
+                // right boundary
+                map.put(num+right, sum);
+
+                max = Math.max(max, sum);
+            }
+        }
+
+        return max;
     }
 }

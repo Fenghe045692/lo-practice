@@ -27,6 +27,7 @@ public class ArraysQuestions {
 //                                                        {'1','0','1','0','1'},
 //                                                        {'1','1','1','1', '1'}}));
 //        System.out.println(test.largestRectangleArea(new int[]{2,1,5,6,2,3}));
+        System.out.println(test.singleNumber(new int[]{2, 2, 1}));
     }
 
 
@@ -392,5 +393,14 @@ public class ArraysQuestions {
             }
         }
         return water;
+    }
+
+    public int singleNumber(int[] nums) {
+        int rst = 0;
+        for(int num : nums){
+            rst ^= num;
+        }
+
+        return rst;
     }
 }

@@ -9,43 +9,77 @@ public class Sat170715 {
     public static void main(String[] args){
         Sat170715 test = new Sat170715();
 //        System.out.println(test.isMatch("a", "a*"));
-        System.out.println(test.isExpressionMatchDFS("aab", "c*a*b"));
+        System.out.println(test.isMatchDFS("aab", "c*a*b"));
     }
 
+    /**
+     * 记忆化搜索看似只是小小的优化，但对运行时间却能有巨大的提升。不同子问题的个数总共有O(mn)个，每个子问题只计算一遍。
+     * 每个子问题的开销不包含任何循环，所以只有O(1)。所以总的时间复杂度变成了O(mn)。记忆化搜索分配了O(nm)的空间，换来的运行时间的提升，
+     * 是一个空间换时间的策略。 仔细思考不难观察出来，分治法它本质上是在一个图上做一个深度优先搜索，
+     * 而记忆化搜索本质上是按照这个图的拓扑顺序（topological order）的逆序填表。如果我们能用简单的循环描述出图的拓扑顺序，
+     * 那么就可以用迭代的形式来完成填表的任务，这就是著名的动态规划。
+     * https://www.laioffer.com/singleblog.html?category=algorithm&id=9
+     * @param str1
+     * @param str2
+     * @return
+     */
     public boolean isExpresionMatch(String str1, String str2){
+//        if(str1 == null || str2 == null){
+//            return false;
+//        }
+//
+//        int m = str1.length();
+//        int n = str2.length();
+//        // dp[i][j] represents whether p.substring(0, j] can match s.substring(0, i]
+//        boolean[][] dp = new boolean[m+1][n+1];
+//        dp[0][0] = true;
+//        for(int i = 1; i <= m; i++){
+//            for(int j = 1; j <= n; j++){
+//                // induction rule
+//                // 1. str2[j-1] == '.' : dp[i-1][j-1]
+//                // 2. str2[j-1] == '*' :
+//                //  2.1 if str2[j-2] == '.' or str[j-2] == str1[i-1]
+//                //       dp[i][j] = dp[i-1][j](multiple str2[j-2]) || dp[i][j-1](one) || dp[i][j-2](zero)
+//                //  2.2 str[j-2] != str1[i-1] dp[i][j] = dp[i][j-2](zero str2[j-2])
+//                // 3. str2[j-1] is a letter dp[i][j] = str1[i-1] == str2[j-1] && dp[i-1][j-1]
+//                if(str2.charAt(j-1) == '.'){
+//                    dp[i][j] = dp[i-1][j-1];
+//                }else if(str2.charAt(j-1) == '*'){
+//                    if(str2.charAt(j-2) == '.' || str2.charAt(j-2) == str1.charAt(i-1)){
+//                        dp[i][j] = dp[i-1][j] || dp[i][j-1] || dp[i][j-2];
+//                    }else {
+//                        dp[i][j] = dp[i][j-2];
+//                    }
+//                }else{
+//                    dp[i][j] = str1.charAt(i-1) == str2.charAt(j-1) && dp[i-1][j-1];
+//                }
+//            }
+//        }
+//
+//        return dp[m][n];
         if(str1 == null || str2 == null){
             return false;
         }
 
         int m = str1.length();
         int n = str2.length();
-        // dp[i][j] represents whether p.substring(0, j] can match s.substring(0, i]
-        boolean[][] dp = new boolean[m+1][n+1];
-        dp[0][0] = true;
-        for(int i = 1; i <= m; i++){
-            for(int j = 1; j <= n; j++){
-                // induction rule
-                // 1. str2[j-1] == '.' : dp[i-1][j-1]
-                // 2. str2[j-1] == '*' :
-                //  2.1 if str2[j-2] == '.' or str[j-2] == str1[i-1]
-                //       dp[i][j] = dp[i-1][j](multiple str2[j-2]) || dp[i][j-1](one) || dp[i][j-2](zero)
-                //  2.2 str[j-2] != str1[i-1] dp[i][j] = dp[i][j-2](zero str2[j-2])
-                // 3. str2[j-1] is a letter dp[i][j] = str1[i-1] == str2[j-1] && dp[i-1][j-1]
-                if(str2.charAt(j-1) == '.'){
-                    dp[i][j] = dp[i-1][j-1];
-                }else if(str2.charAt(j-1) == '*'){
-                    if(str2.charAt(j-2) == '.' || str2.charAt(j-2) == str1.charAt(i-1)){
-                        dp[i][j] = dp[i-1][j] || dp[i][j-1] || dp[i][j-2];
-                    }else {
-                        dp[i][j] = dp[i][j-2];
-                    }
+        boolean[][] dp = new boolean[2][n+1];
+        for(int i = 0; i <= m; i++){
+            for(int j = 0; j <= n; j++){
+                if(j == 0){
+                    dp[i%2][j] = i == 0;
                 }else{
-                    dp[i][j] = str1.charAt(i-1) == str2.charAt(j-1) && dp[i-1][j-1];
+                    if(str2.charAt(j-1) == '*'){
+                        dp[i%2][j] = dp[i][j-2] || (i != 0 && isMatch(str1.charAt(i-1), str2.charAt(j-2))
+                                && dp[(i+1) % 2][j]);
+                    }else{
+                        dp[i%2][j] = i != 0 && isMatch(str1.charAt(i-1), str2.charAt(j-1)) && dp[(i+1)%2][j-1];
+                    }
                 }
             }
         }
 
-        return dp[m][n];
+        return dp[m%2][n];
     }
 
     /**
@@ -54,58 +88,45 @@ public class Sat170715 {
      * @param str2
      * @return
      */
-    public boolean isExpressionMatchDFS(String str1, String str2){
-        int[][] mem = new int[str1.length() + 1][str2.length() + 1];
-
-        boolean valid = dfs(str1, str2, mem, str1.length(), str2.length());
-        Utilies.print2DArray(mem);
-        return valid;
+    public boolean isMatchDFS(String str1, String str2) {
+        return dfs(str1, str2, new Boolean[str1.length() + 1][str2.length() + 1], 0, 0);
     }
 
-    public boolean dfs(String str1, String str2, int[][] mem, int indexS, int indexP){
-        // base case
-        if(mem[indexS][indexP] != 0){
-            return mem[indexS][indexP] == 2;
-        }
-        if(indexS == 0 && indexP == 0){
-            mem[0][0] = 2;
-            return true;
-        }
-
-        if(indexS == 0 && indexP == 1){
-            mem[0][1] = 1;
-            return false;
-        }
-
-        if(indexS == 0){
-            boolean valid = str2.charAt(indexP-1) == '*' ? dfs(str1, str2, mem, 0, indexP - 2) : Boolean.FALSE;
-            mem[0][indexP] = valid ? 2 : 1;
-            return valid;
+    /**
+     * Check if str1.substring(indexS) matches str2.substring(indexP).
+     * ATTENTION: we do not need always to follow dp base case to define dfs' corner case
+     * since we can directly give the output.
+     * @param str1
+     * @param str2
+     * @param mem
+     * @param i
+     * @param j
+     * @return
+     */
+    public boolean dfs(String str1, String str2, Boolean[][] mem, int i, int j){
+        if(mem[i][j] != null){
+            return mem[i][j];
         }
 
-        if(indexP == 0){
-            mem[indexS][0] = 1;
-            return false;
+        if(j == str2.length()){
+            return i == str1.length();
+        }
+        char c = str2.charAt(j);
+        if(j+1 < str2.length() && str2.charAt(j+1) == '*'){
+            mem[i][j] = dfs(str1, str2, mem, i, j+2) ||
+                    (i < str1.length() && isMatch(str1.charAt(i), str2.charAt(j)) &&
+                            dfs(str1, str2, mem, i+1, j));
+            return mem[i][j];
+
         }
 
-        boolean valid;
-        if(str2.charAt(indexP - 1) == '.'){
-            valid = dfs(str1, str2, mem, indexS-1, indexP-1);
-        }else if(str2.charAt(indexP - 1) == '*'){
-            if(str2.charAt(indexP - 2) == '.' || str2.charAt(indexP - 2) == str1.charAt(indexS-1)){
-                valid =  dfs(str1, str2, mem, indexS - 1, indexP) || dfs(str1, str2, mem, indexS, indexP - 1) ||
-                        dfs(str1, str2, mem, indexS, indexP - 2);
-            }else {
-                valid = dfs(str1, str2, mem, indexS, indexP - 2);
-            }
-        }else{
-            valid = str1.charAt(indexS - 1) == str2.charAt(indexP - 1) && dfs(str1, str2, mem, indexS - 1, indexP - 1);
-        }
+        mem[i][j] = i < str1.length() && isMatch(str1.charAt(i), str2.charAt(j)) && dfs(str1, str2, mem, i+1, j+1);
+        return mem[i][j];
+}
 
-        mem[indexS][indexP] = valid ? 2 : 1;
-        return valid;
+    private boolean isMatch(char a, char b){
+        return b == '.'  || a == b;
     }
-
     public boolean isMatch(String str1, String str2){
         if(str1 == null || str2 == null){
             return false;
