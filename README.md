@@ -1,1 +1,1 @@
-This repository is my personal library for algorithms questions.:
+This repository is my personal library for algorithms questions.
