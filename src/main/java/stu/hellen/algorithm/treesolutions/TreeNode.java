@@ -1,4 +1,4 @@
-package stu.hellen.algorithm.BinaryTreeaAndBinarySearchTreeSolutions;
+package stu.hellen.algorithm.treesolutions;
 
 public class TreeNode {
     int val;

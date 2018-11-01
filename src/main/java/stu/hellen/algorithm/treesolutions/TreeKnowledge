@@ -1,0 +1,36 @@
+1. Binary Tree:
+    We extend the concept of linked data structures to structure containing nodes with more than one self-referenced field. A binary tree is made of
+    nodes, where each node contains a "left" reference, a "right" reference, and a data element. The topmost node in the tree is called the root.
+    Every node (excluding a root) in a tree is connected by a directed edge from exactly one other node. This node is called a parent.
+    On the other hand, each node can be connected to arbitrary number of nodes, called children. Nodes with no children are called leaves,
+    or external nodes. Nodes which are not leaves are called internal nodes. Nodes with the same parent are called siblings.
+
+    a.The depth of a node is the number of edges from the root to the node
+    b,The height of a node is the number of edges from the root to the deepest leaf
+    c,The height of the tree is a height of the tree
+
+2. Full Tree:
+   A full binary tree.is a binary tree in which each node has exactly zero or two children.
+
+3. Complete Tree:
+   A complete tree is a binary tree, which is complete filled, with the possible exception of the bottom level, which is filled from the left to right.
+
+4. Balance Tree:
+
+   weight-balance
+      A binary tree is balanced if for each node it holds that the number of inner nodes in the left subtree and
+      the number of inner nodes in the right subtree differ by at most 1.
+
+   Height-balance
+      A binary tree is balanced if for any two leaves the difference of the depth is at most 1.
+
+5. Binary Search Tree:
+
+
+6. Traversals
+   a. depth-first traversal
+   b, breadth-first traversal
+
+   c. PreOrder traversal - visit the parent first and then left and right children;
+   d, InOrder traversal - visit the left child, then the parent and the right child;
+   e. PostOrder traversal - visit left child, then the right child and then the parent;
