@@ -1,4 +1,4 @@
-package stu.hellen.algorithm.treesolutions;
+package stu.hellen.algorithm.TreeSolutions;
 
 import java.util.*;
 
@@ -265,7 +265,7 @@ public class TreeItems {
             return null;
         }
 
-        while(root.left != null || root.right != null){
+        if(root.left != null || root.right != null){
             TreeNode temp = root.left;
             root.left = root.right;
             root.right = temp;
@@ -283,24 +283,30 @@ public class TreeItems {
 
     public List<List<Integer>> levelOrder(TreeNode root) {
         List<List<Integer>> result = new ArrayList<>();
+//        List<Integer> list = new ArrayList<>(); shouldn't be implemented outside.
 
-        List<Integer> list = new ArrayList<>();
+        if(root == null){
+            return result;
+        }
 
         Deque<TreeNode> deque = new LinkedList<>();
 
         deque.addFirst(root);
 
         while(!deque.isEmpty()){
-            TreeNode pNode = deque.pollFirst();
-            list.add(pNode.val);
+            List<Integer> list = new ArrayList<>();
+            int size = deque.size();
 
-            while(pNode.left != null || pNode.right != null){
-                if(pNode.right != null){
-                    deque.addFirst(pNode.right);
-                }
+            while(size-- != 0){
+                TreeNode pNode = deque.pollLast();
+                list.add(pNode.val);
 
                 if(pNode.left != null){
                     deque.addFirst(pNode.left);
+                }
+
+                if(pNode.right != null){
+                    deque.addFirst(pNode.right);
                 }
             }
 
