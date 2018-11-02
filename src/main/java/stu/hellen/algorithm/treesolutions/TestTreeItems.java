@@ -1,4 +1,4 @@
-package stu.hellen.algorithm.TreeSolutions;
+package stu.hellen.algorithm.treesolutions;
 
 public class TestTreeItems {
     TreeItems tt = new TreeItems();
