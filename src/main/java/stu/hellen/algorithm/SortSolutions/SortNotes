@@ -1,0 +1,9 @@
+1. What's recursion
+     When we write a method for solving a particular problem, one of teh basic design techniques is to break the task into smaller subtasks.
+     so that when the subtasks resolved then the recursion function will call itself until reach the base case.
+
+     When to write recursion function make sure
+       1. base case
+       2. endless loop
+
+2. mergeSort and quickSort will use recursion
