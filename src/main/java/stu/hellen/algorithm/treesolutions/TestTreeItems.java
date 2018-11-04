@@ -1,7 +1,12 @@
 package stu.hellen.algorithm.treesolutions;
 
+import java.util.Comparator;
+import java.util.PriorityQueue;
+
 public class TestTreeItems {
     TreeItems tt = new TreeItems();
+
+
 
     public void testpreOrder(){
         tt.root = new TreeNode(10);
@@ -106,10 +111,14 @@ public class TestTreeItems {
     }
 
     public static void main(String args[]){
-        TestTreeItems tti = new TestTreeItems();
+//        TestTreeItems tti = new TestTreeItems();
+//
+//        tti.testLevelOrder();
 
-        tti.testLevelOrder();
-
+        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.naturalOrder());
+        pq.offer("hellen");
+        pq.offer("json");
+        System.out.print(pq.peek());
 //        tti.testpreOrder();
 //        tti.testinOrder();
 //        tti.testPostOrder();

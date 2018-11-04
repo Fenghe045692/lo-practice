@@ -1,6 +1,6 @@
 package stu.hellen.algorithm.treesolutions;
 
-public class TreeNode {
+public class TreeNode implements Comparable<TreeNode>{
     int val;
     TreeNode left;
     TreeNode right;
@@ -9,5 +9,8 @@ public class TreeNode {
         this.val = val;
     }
 
-
+    @Override
+    public int compareTo(TreeNode o) {
+        return val - o.val;
+    }
 }
